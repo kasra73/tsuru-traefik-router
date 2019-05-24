@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/bin/node /usr/share/yarn/bin/yarn.js add @types/koa-body --dev
+  /usr/bin/node /usr/share/yarn/bin/yarn.js add --dev @types/koa-body
 
 PATH: 
   /home/monster/.yarn/bin:/home/monster/.config/yarn/global/node_modules/.bin:./vendor/bin:/usr/local/cuda-9.0/bin:/media/monster/D_Drive/Android/android-sdk/tools/bin:/media/monster/D_Drive/Android/android-sdk/tools:/media/monster/D_Drive/Android/android-sdk/platform-tools/:/home/monster/.composer/vendor/bin:/home/monster/.cargo/bin:/home/monster/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/bin:/home/monster/.composer/vendor/bin:/home/monster/.cargo/bin
@@ -34,9 +34,11 @@ npm manifest:
     "license": "CC0-1.0",
     "scripts": {
       "build-server": "tslint --project . && tsc",
-      "watch-server": "cross-env NODE_ENV=development nodemon --watch src/**/* -e ts,tsx --exec ts-node src/server/server.ts"
+      "watch-server": "cross-env NODE_ENV=development nodemon --watch src -e ts,tsx --exec ts-node src/server/server.ts"
     },
     "devDependencies": {
+      "@types/consul": "0.23.33",
+      "@types/dotenv": "6.1.1",
       "@types/koa": "2.0.39",
       "@types/koa-router": "7.0.23",
       "cross-env": "5.0.5",
@@ -46,6 +48,8 @@ npm manifest:
       "typescript": "2.5.2"
     },
     "dependencies": {
+      "consul": "0.34.1",
+      "dotenv": "8.0.0",
       "koa": "2.3.0",
       "koa-body": "4.1.0",
       "koa-router": "7.2.1"
@@ -82,6 +86,13 @@ Lockfile:
     dependencies:
       "@types/node" "*"
   
+  "@types/consul@0.23.33":
+    version "0.23.33"
+    resolved "https://registry.yarnpkg.com/@types/consul/-/consul-0.23.33.tgz#ef9876fd75fdfed9b5b1afe320ccdb6456eb90d2"
+    integrity sha512-scpn9tiAh+IJXJipP2cpp0kJCUeWGOnoBfChGK+k2Zi0ifQMyPUHhG/d9J+Eyz4T/ZCn+J5yvq4Wr0b45TwACg==
+    dependencies:
+      "@types/node" "*"
+  
   "@types/cookies@*":
     version "0.7.2"
     resolved "https://registry.yarnpkg.com/@types/cookies/-/cookies-0.7.2.tgz#5e0560d46ed9998082dce799af1058dd6a49780a"
@@ -90,6 +101,13 @@ Lockfile:
       "@types/connect" "*"
       "@types/express" "*"
       "@types/keygrip" "*"
+      "@types/node" "*"
+  
+  "@types/dotenv@6.1.1":
+    version "6.1.1"
+    resolved "https://registry.yarnpkg.com/@types/dotenv/-/dotenv-6.1.1.tgz#f7ce1cc4fe34f0a4373ba99fefa437b0bec54b46"
+    integrity sha512-ftQl3DtBvqHl9L16tpqqzA4YzCSXZfi7g8cQceTz5rOlYtk/IZbFjAv3mLOQlNIgOaylCQWQoBdDQHPgEBJPHg==
+    dependencies:
       "@types/node" "*"
   
   "@types/events@*":
@@ -559,6 +577,13 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/console-control-strings/-/console-control-strings-1.1.0.tgz#3d7cf4464db6446ea644bf4b39507f9851008e8e"
     integrity sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=
   
+  consul@0.34.1:
+    version "0.34.1"
+    resolved "https://registry.yarnpkg.com/consul/-/consul-0.34.1.tgz#b000638ad99db038fbb98e508c32d758bf598968"
+    integrity sha512-xCLBzPQBgnDgC2LdYnrT/Fc6PglRU6u7EBkpW0ExAx3Am/CdtKcP5o/3jfwOy7PBAwBqnJk3AYdwwGg+arriiQ==
+    dependencies:
+      papi "^0.29.0"
+  
   content-disposition@~0.5.0:
     version "0.5.3"
     resolved "https://registry.yarnpkg.com/content-disposition/-/content-disposition-0.5.3.tgz#e130caf7e7279087c5616c2007d0485698984fbd"
@@ -707,6 +732,11 @@ Lockfile:
     integrity sha512-tUMXrxlExSW6U2EXiiKGSBVdYgtV8qlHL+C10TsW4PURY/ic+eaysnSkwB4kA/mBlCyy/IKDJ+Lc3wbWeaXtuQ==
     dependencies:
       is-obj "^1.0.0"
+  
+  dotenv@8.0.0:
+    version "8.0.0"
+    resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.0.0.tgz#ed310c165b4e8a97bb745b0a9d99c31bda566440"
+    integrity sha512-30xVGqjLjiUOArT4+M5q9sYdvuR4riM6yK9wMcas9Vbp6zZa+ocC9dp6QoftuhTPhFAiLK/0C5Ni2nou/Bk8lg==
   
   duplexer3@^0.1.4:
     version "0.1.4"
@@ -1919,6 +1949,11 @@ Lockfile:
       registry-auth-token "^3.0.1"
       registry-url "^3.0.3"
       semver "^5.1.0"
+  
+  papi@^0.29.0:
+    version "0.29.1"
+    resolved "https://registry.yarnpkg.com/papi/-/papi-0.29.1.tgz#7373e2c527f5117d61fd2a0e6c6b1dd72bf7f180"
+    integrity sha512-Y9ipSMfWuuVFO3zY9PlxOmEg+bQ7CeJ28sa9/a0veYNynLf9fwjR3+3fld5otEy7okUaEOUuCHVH62MyTmACXQ==
   
   parse-glob@^3.0.4:
     version "3.0.4"

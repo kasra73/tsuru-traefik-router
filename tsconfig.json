@@ -4,9 +4,14 @@
         "target": "es2017",
         "noImplicitAny": true,
         "outDir": "./dist",
-        "sourceMap": true
+        "sourceMap": true,
+		"typeRoots": [
+			"./node_modules/@types",
+			"./node_modules/koa-body"
+		]
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "node_modules/koa-body"
     ]
 }

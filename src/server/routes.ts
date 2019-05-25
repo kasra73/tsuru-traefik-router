@@ -28,14 +28,15 @@ const validateName = (ctx: any, next: any) => {
 // Manage Backends
 router.get('/backend/:name', validateName, async (ctx) => {
     const name = ctx.params.name;
-    try {
-        const result = await consul.kv.keys('traefik/backends/' + name);
-        ctx.body = { result };
-    } catch (err) {
-        console.log('keys: ', err);
-        ctx.status = 500;
-        ctx.body = { err };
-    }
+    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    // try {
+    //     const result = await consul.kv.keys('traefik/backends/' + name);
+    //     ctx.body = { result };
+    // } catch (err) {
+    //     console.log('keys: ', err);
+    //     ctx.status = 500;
+    //     ctx.body = { err };
+    // }
 });
 router.delete('/backend/:name', validateName, async (ctx) => {
     const name = ctx.params.name;

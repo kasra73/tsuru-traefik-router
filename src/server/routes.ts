@@ -61,6 +61,11 @@ router.post('/backend/:name', validateName, async (ctx) => {
     consul.kv.set('traefik/frontends/' + name + '/backend', name);
     ctx.body = { body: ctx.request.body, name };
 });
+router.put('/backend/:name/healthcheck', validateName, async (ctx) => {
+    const name = ctx.params.name;
+    consul.kv.set('traefik/backends/' + name + '/healthcheck/path', ctx.request.body.Path);
+    ctx.body = { body: ctx.request.body, name };
+});
 // Manage Backend Routes
 router.get('/backend/:name/routes', async (ctx) => {
     const name = ctx.params.name;
@@ -97,12 +102,13 @@ router.post('/backend/:name/routes/remove', async (ctx) => {
 });
 router.post('/backend/:name/swap', async (ctx) => {
     const name = ctx.params.name;
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.status = 412;
+    ctx.body = { message: 'swap not supported' };
 });
 router.get('/backend/:name/status', async (ctx) => {
     ctx.body = [{
-        status: 'yellow',
-        detail: '3/4 units are running',
+        status: 'green',
+        detail: 'Units are running',
     }];
 });
 
@@ -125,12 +131,22 @@ router.get('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
     ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
 });
-router.put('/backend/:name/cname/:cname', async (ctx) => {
+router.post('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
+    const cname = ctx.params.cname;
+    const appMainAddress = `${name}.${ROUTER_DOMAIN}`;
+    consul.kv.set('traefik/frontends/' + cname + '/routes/' + cname + '/rule', 'Host:' + appMainAddress);
+    consul.kv.set('traefik/frontends/' + cname + '/backend', name);
+    consul.kv.set(MANAGER_KEYS_PREFIX + name + '/cnames/' + cname, '1');
     ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
 });
 router.delete('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
+    const cname = ctx.params.cname;
+    const cnameKey = await consul.kv.get(MANAGER_KEYS_PREFIX + name + '/cnames/' + cname);
+    if (cnameKey) {
+        consul.kv.del({ key: 'traefik/frontends/' + cname, recurse: true });
+    }
     ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
 });
 
@@ -146,7 +162,8 @@ router.get('/info', async (ctx) => {
 
 // Check Supported Routes
 router.get('/support/tls', async (ctx) => {
-    ctx.body = 'Yes';
+    ctx.status = 400;
+    ctx.body = 'No';
 });
 router.get('/support/cname', async (ctx) => {
     ctx.body = 'Yes';

@@ -28,7 +28,7 @@ const validateName = (ctx: any, next: any) => {
 // Manage Backends
 router.get('/backend/:name', validateName, async (ctx) => {
     const name = ctx.params.name;
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = { address: `${name}.${ROUTER_DOMAIN}` };
     // try {
     //     const result = await consul.kv.keys('traefik/backends/' + name);
     //     ctx.body = { result };
@@ -163,7 +163,11 @@ router.get('/info', async (ctx) => {
 
 // Check Supported Routes
 router.get('/support/tls', async (ctx) => {
-    ctx.status = 400;
+    ctx.status = 404;
+    ctx.body = 'No';
+});
+router.get('/support/status', async (ctx) => {
+    ctx.status = 404;
     ctx.body = 'No';
 });
 router.get('/support/cname', async (ctx) => {

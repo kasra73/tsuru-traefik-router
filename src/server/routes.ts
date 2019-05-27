@@ -99,7 +99,7 @@ router.post('/backend/:name/routes/remove', async (ctx) => {
         const hash = sha1Hasher.update(address).digest('hex');
         consul.kv.del({ key: 'traefik/backends/' + name + '/servers/server' + hash, recurse: true });
     }
-    ctx.body = [ { addresses: aa } ];
+    ctx.body = [ { addresses } ];
 });
 router.post('/backend/:name/swap', async (ctx) => {
     const name = ctx.params.name;

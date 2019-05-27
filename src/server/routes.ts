@@ -136,8 +136,7 @@ router.get('/backend/:name/cname/:cname', async (ctx) => {
 router.post('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
     const cname = ctx.params.cname;
-    const appMainAddress = `${name}.${ROUTER_DOMAIN}`;
-    consul.kv.set('traefik/frontends/' + cname + '/routes/' + cname + '/rule', 'Host:' + appMainAddress);
+    consul.kv.set('traefik/frontends/' + cname + '/routes/' + cname + '/rule', 'Host:' + cname);
     consul.kv.set('traefik/frontends/' + cname + '/backend', name);
     consul.kv.set(MANAGER_KEYS_PREFIX + name + '/cnames/' + cname, '1');
     ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];

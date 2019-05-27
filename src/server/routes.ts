@@ -15,7 +15,6 @@ const options = {
 };
 const consul = new Consul(options);
 const router = new Router();
-const sha1Hasher = crypto.createHash('sha1');
 
 const validateName = (ctx: any, next: any) => {
     const name = ctx.params.name;
@@ -87,6 +86,7 @@ router.post('/backend/:name/routes', async (ctx) => {
     consul.kv.set(MANAGER_KEYS_PREFIX + name + '/routes', JSON.stringify(addresses));
     // consul.kv.del({ key: 'traefik/backends/' + name + '/servers', recurse: true }); // delete all routes
     for (const address of addresses ) {
+        const sha1Hasher = crypto.createHash('sha1');
         const hash = sha1Hasher.update(address).digest('hex');
         consul.kv.set('traefik/backends/' + name + '/servers/server' + hash + '/url', address);
     }
@@ -96,6 +96,7 @@ router.post('/backend/:name/routes/remove', async (ctx) => {
     const name = ctx.params.name;
     const addresses = ctx.request.body.addresses;
     for (const address of addresses) {
+        const sha1Hasher = crypto.createHash('sha1');
         const hash = sha1Hasher.update(address).digest('hex');
         consul.kv.del({ key: 'traefik/backends/' + name + '/servers/server' + hash, recurse: true });
     }

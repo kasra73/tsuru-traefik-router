@@ -1,6 +1,7 @@
 import * as Consul from 'consul';
 import * as dotenv from 'dotenv';
 import * as Router from 'koa-router';
+import * as crypto from 'crypto';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const options = {
 };
 const consul = new Consul(options);
 const router = new Router();
+const sha1Hasher = crypto.createHash('sha1');
 
 const validateName = (ctx: any, next: any) => {
     const name = ctx.params.name;
@@ -83,26 +85,19 @@ router.post('/backend/:name/routes', async (ctx) => {
     const name = ctx.params.name;
     const addresses = ctx.request.body.addresses;
     consul.kv.set(MANAGER_KEYS_PREFIX + name + '/routes', JSON.stringify(addresses));
-    consul.kv.del({ key: 'traefik/backends/' + name + '/servers', recurse: true });
-    for (let i = 0; i < addresses.length; i++ ) {
-        consul.kv.set('traefik/backends/' + name + '/servers/server' + i + '/url', addresses[i]);
+    // consul.kv.del({ key: 'traefik/backends/' + name + '/servers', recurse: true }); // delete all routes
+    for (const address of addresses ) {
+        const hash = sha1Hasher.update(address).digest('hex');
+        consul.kv.set('traefik/backends/' + name + '/servers/server' + hash + '/url', address);
     }
     ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
 });
 router.post('/backend/:name/routes/remove', async (ctx) => {
     const name = ctx.params.name;
     const addresses = ctx.request.body.addresses;
-    const aa = [];
-    if (addresses.length > 0) {
-        const result: any = await consul.kv.get({ key: 'traefik/backends/' + name + '/servers', recurse: true });
-        for (const address of addresses) {
-            for (const i in result) {
-                if (result.hasOwnProperty(i) && result[i].Value == address) {
-                    aa.push(address);
-                    consul.kv.del({ key: result[i].Key, recurse: true });
-                }
-            }
-        }
+    for (const address of addresses) {
+        const hash = sha1Hasher.update(address).digest('hex');
+        consul.kv.del({ key: 'traefik/backends/' + name + '/servers/server' + hash, recurse: true });
     }
     ctx.body = [ { addresses: aa } ];
 });

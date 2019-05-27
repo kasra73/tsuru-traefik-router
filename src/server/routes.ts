@@ -1,7 +1,7 @@
 import * as Consul from 'consul';
+import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import * as Router from 'koa-router';
-import * as crypto from 'crypto';
 
 dotenv.config();
 

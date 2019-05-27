@@ -1,4 +1,3 @@
 hooks:
   build:
-    - yarn
     - npm run build-server

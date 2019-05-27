@@ -22,21 +22,26 @@ const validateName = (ctx: any, next: any) => {
         ctx.body = { result: 'error', message: 'Invalid backend name' };
         return;
     }
-    next();
+    return next();
 };
 
 // Manage Backends
 router.get('/backend/:name', validateName, async (ctx) => {
     const name = ctx.params.name;
-    ctx.body = { address: `${name}.${ROUTER_DOMAIN}` };
-    // try {
-    //     const result = await consul.kv.keys('traefik/backends/' + name);
-    //     ctx.body = { result };
-    // } catch (err) {
-    //     console.log('keys: ', err);
-    //     ctx.status = 500;
-    //     ctx.body = { err };
-    // }
+    try {
+        const result = await consul.kv.keys('traefik/backends/' + name);
+        // ctx.body = { result };
+        ctx.body = { address: `${name}.${ROUTER_DOMAIN}` };
+    } catch (err) {
+        if (err.statusCode == 404) {
+            ctx.status = 200;
+            ctx.body = { };
+            return;
+        }
+        ctx.status = 500;
+        ctx.body = { err };
+        console.log('error: ', err);
+    }
 });
 router.delete('/backend/:name', validateName, async (ctx) => {
     const name = ctx.params.name;

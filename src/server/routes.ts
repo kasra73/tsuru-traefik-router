@@ -63,15 +63,15 @@ router.delete('/backend/:name', validateName, async (ctx) => {
 router.post('/backend/:name', validateName, async (ctx) => {
     const name = ctx.params.name;
     const appMainAddress = `${name}.${ROUTER_DOMAIN}`;
-    consul.kv.set(MANAGER_KEYS_PREFIX + name + '/info', JSON.stringify(ctx.request.body));
+    consul.kv.set(MANAGER_KEYS_PREFIX + name + '/info', JSON.stringify((ctx.request as any).body));
     consul.kv.set('traefik/frontends/' + name + '/routes/main/rule', 'Host:' + appMainAddress);
     consul.kv.set('traefik/frontends/' + name + '/backend', name);
-    ctx.body = { body: ctx.request.body, name };
+    ctx.body = { body: (ctx.request as any).body, name };
 });
 router.put('/backend/:name/healthcheck', validateName, async (ctx) => {
     const name = ctx.params.name;
-    consul.kv.set('traefik/backends/' + name + '/healthcheck/path', ctx.request.body.Path);
-    ctx.body = { body: ctx.request.body, name };
+    consul.kv.set('traefik/backends/' + name + '/healthcheck/path', (ctx.request as any).body.Path);
+    ctx.body = { body: (ctx.request as any).body, name };
 });
 // Manage Backend Routes
 router.get('/backend/:name/routes', async (ctx) => {
@@ -82,7 +82,7 @@ router.get('/backend/:name/routes', async (ctx) => {
 });
 router.post('/backend/:name/routes', async (ctx) => {
     const name = ctx.params.name;
-    const addresses = ctx.request.body.addresses;
+    const addresses = (ctx.request as any).body.addresses;
     consul.kv.set(MANAGER_KEYS_PREFIX + name + '/routes', JSON.stringify(addresses));
     // consul.kv.del({ key: 'traefik/backends/' + name + '/servers', recurse: true }); // delete all routes
     for (const address of addresses ) {
@@ -94,7 +94,7 @@ router.post('/backend/:name/routes', async (ctx) => {
 });
 router.post('/backend/:name/routes/remove', async (ctx) => {
     const name = ctx.params.name;
-    const addresses = ctx.request.body.addresses;
+    const addresses = (ctx.request as any).body.addresses;
     for (const address of addresses) {
         const sha1Hasher = crypto.createHash('sha1');
         const hash = sha1Hasher.update(address).digest('hex');

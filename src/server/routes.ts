@@ -129,6 +129,13 @@ router.delete('/backend/:name/certificate/:certname', async (ctx) => {
 });
 
 // Manage CNames
+router.get('/backend/:name/cname', async (ctx) => {
+    const name = ctx.params.name;
+    const cnames = await consul.kv.get(MANAGER_KEYS_PREFIX + name + '/cnames');
+    console.log(cnames);
+    ctx.status = 404;
+    ctx.body = [ { cnames: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+});
 router.get('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
     ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];

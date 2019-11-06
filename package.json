@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "CC0-1.0",
   "engines": {
-    "node": "10.x"
+    "node": "v10.17.0"
   },
   "scripts": {
     "build-server": "tslint --project . && tsc",

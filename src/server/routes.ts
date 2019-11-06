@@ -133,8 +133,7 @@ router.get('/backend/:name/cname', async (ctx) => {
     const name = ctx.params.name;
     const prefix = MANAGER_KEYS_PREFIX + name + '/cnames/';
     const cnames = await consul.kv.keys();
-    console.log(cnames);
-    const cnamesArray = (cnames as string[])
+    const cnamesArray = (cnames as string[]);
     for (let i = 0; i < cnamesArray.length; i++) {
         cnamesArray[i] = cnamesArray[i].replace(prefix, '');
     }

@@ -84,9 +84,9 @@ router.get('/backend/:name/routes', async (ctx) => {
             addresses.push(obj.Value);
         }
         console.log({ addresses });
-        ctx.body = [{ addresses }];
+        ctx.body = { addresses };
     } catch (err) {
-        ctx.body = [{ addresses: [] }];
+        ctx.body = { addresses: [] };
     }
 });
 router.post('/backend/:name/routes', async (ctx) => {

@@ -137,7 +137,9 @@ router.get('/backend/:name/cname', async (ctx) => {
         const cnames = await consul.kv.keys(prefix);
         cnamesArray = (cnames as string[]);
     } catch (err) {
-        console.error(err);
+        if (err.statusCode !== 404) {
+            console.error(err);
+        }
         cnamesArray = [];
     }
     for (let i = 0; i < cnamesArray.length; i++) {

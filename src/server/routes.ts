@@ -132,12 +132,17 @@ router.delete('/backend/:name/certificate/:certname', async (ctx) => {
 router.get('/backend/:name/cname', async (ctx) => {
     const name = ctx.params.name;
     const prefix = MANAGER_KEYS_PREFIX + name + '/cnames/';
-    const cnames = await consul.kv.keys(prefix);
-    const cnamesArray = (cnames as string[]);
+    let cnamesArray: string[];
+    try {
+        const cnames = await consul.kv.keys(prefix);
+        cnamesArray = (cnames as string[]);
+    } catch (err) {
+        console.error(err);
+        cnamesArray = [];
+    }
     for (let i = 0; i < cnamesArray.length; i++) {
         cnamesArray[i] = cnamesArray[i].replace(prefix, '');
     }
-    console.log({ cnames: cnamesArray });
     ctx.status = 200;
     ctx.body = { cnames: cnamesArray };
 });

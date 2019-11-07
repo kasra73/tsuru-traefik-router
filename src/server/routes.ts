@@ -77,6 +77,7 @@ router.put('/backend/:name/healthcheck', validateName, async (ctx) => {
 router.get('/backend/:name/routes', async (ctx) => {
     const name = ctx.params.name;
     const a = await consul.kv.get({ key: 'traefik/backends/' + name + '/servers', recurse: true });
+    console.log(a);
     ctx.body = a;
     // ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
 });

@@ -137,6 +137,7 @@ router.get('/backend/:name/cname', async (ctx) => {
     for (let i = 0; i < cnamesArray.length; i++) {
         cnamesArray[i] = cnamesArray[i].replace(prefix, '');
     }
+    console.log({ cnames: cnamesArray });
     ctx.status = 200;
     ctx.body = { cnames: cnamesArray };
 });

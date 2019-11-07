@@ -36,7 +36,7 @@ router.get('/backend/:name', validateName, async (ctx) => {
     } catch (err) {
         if (err.statusCode == 404) {
             ctx.status = 200;
-            ctx.body = { };
+            ctx.body = {};
             return;
         }
         ctx.status = 500;
@@ -76,22 +76,30 @@ router.put('/backend/:name/healthcheck', validateName, async (ctx) => {
 // Manage Backend Routes
 router.get('/backend/:name/routes', async (ctx) => {
     const name = ctx.params.name;
-    const a = await consul.kv.get({ key: 'traefik/backends/' + name + '/servers', recurse: true });
-    console.log(a);
-    ctx.body = a;
-    // ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    try {
+        const objects = await consul.kv.get({ key: 'traefik/backends/' + name + '/servers', recurse: true });
+        const array = (objects as any);
+        const addresses: string[] = [];
+        for (const obj of array) {
+            addresses.push(obj.Value);
+        }
+        console.log({ addresses });
+        ctx.body = [{ addresses }];
+    } catch (err) {
+        ctx.body = [{ addresses: [] }];
+    }
 });
 router.post('/backend/:name/routes', async (ctx) => {
     const name = ctx.params.name;
     const addresses = (ctx.request as any).body.addresses;
     consul.kv.set(MANAGER_KEYS_PREFIX + name + '/routes', JSON.stringify(addresses));
     // consul.kv.del({ key: 'traefik/backends/' + name + '/servers', recurse: true }); // delete all routes
-    for (const address of addresses ) {
+    for (const address of addresses) {
         const sha1Hasher = crypto.createHash('sha1');
         const hash = sha1Hasher.update(address).digest('hex');
         consul.kv.set('traefik/backends/' + name + '/servers/server' + hash + '/url', address);
     }
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = [{ addresses: [`${name}.${ROUTER_DOMAIN}`] }];
 });
 router.post('/backend/:name/routes/remove', async (ctx) => {
     const name = ctx.params.name;
@@ -101,7 +109,7 @@ router.post('/backend/:name/routes/remove', async (ctx) => {
         const hash = sha1Hasher.update(address).digest('hex');
         consul.kv.del({ key: 'traefik/backends/' + name + '/servers/server' + hash, recurse: true });
     }
-    ctx.body = [ { addresses } ];
+    ctx.body = [{ addresses }];
 });
 router.post('/backend/:name/swap', async (ctx) => {
     const name = ctx.params.name;
@@ -118,15 +126,15 @@ router.get('/backend/:name/status', async (ctx) => {
 // Manage Certificates
 router.get('/backend/:name/certificate/:certname', async (ctx) => {
     const name = ctx.params.name;
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = [{ addresses: [`${name}.${ROUTER_DOMAIN}`] }];
 });
 router.put('/backend/:name/certificate/:certname', async (ctx) => {
     const name = ctx.params.name;
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = [{ addresses: [`${name}.${ROUTER_DOMAIN}`] }];
 });
 router.delete('/backend/:name/certificate/:certname', async (ctx) => {
     const name = ctx.params.name;
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = [{ addresses: [`${name}.${ROUTER_DOMAIN}`] }];
 });
 
 // Manage CNames
@@ -151,7 +159,7 @@ router.get('/backend/:name/cname', async (ctx) => {
 });
 router.get('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = [{ addresses: [`${name}.${ROUTER_DOMAIN}`] }];
 });
 router.post('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
@@ -159,7 +167,7 @@ router.post('/backend/:name/cname/:cname', async (ctx) => {
     consul.kv.set('traefik/frontends/' + cname + '/routes/' + cname + '/rule', 'Host:' + cname);
     consul.kv.set('traefik/frontends/' + cname + '/backend', name);
     consul.kv.set(MANAGER_KEYS_PREFIX + name + '/cnames/' + cname, '1');
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = [{ addresses: [`${name}.${ROUTER_DOMAIN}`] }];
 });
 router.delete('/backend/:name/cname/:cname', async (ctx) => {
     const name = ctx.params.name;
@@ -168,7 +176,7 @@ router.delete('/backend/:name/cname/:cname', async (ctx) => {
     if (cnameKey) {
         consul.kv.del({ key: 'traefik/frontends/' + cname, recurse: true });
     }
-    ctx.body = [ { addresses: [ `${name}.${ROUTER_DOMAIN}` ] } ];
+    ctx.body = [{ addresses: [`${name}.${ROUTER_DOMAIN}`] }];
 });
 
 router.get('/healthcheck', async (ctx) => {

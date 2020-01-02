@@ -7,12 +7,18 @@ dotenv.config();
 
 const MANAGER_KEYS_PREFIX = process.env.MANAGER_KEYS_PREFIX;
 const ROUTER_DOMAIN = process.env.ROUTER_DOMAIN;
-const options = {
+const options: any = {
     host: process.env.CONSUL_HOST,
     port: process.env.CONSUL_PORT,
     secure: (process.env.CONSUL_SECURE == 'true'),
     promisify: true,
 };
+if (process.env.CONSUL_AUTHORIZATION) {
+    options.headers = {
+        Authorization: process.env.CONSUL_AUTHORIZATION,
+    };
+}
+
 const consul = new Consul(options);
 const router = new Router();
 
